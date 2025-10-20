@@ -14,7 +14,7 @@ int main()
     cout << "Шифр с поддержкой русского алфавита" << endl;
     cout << "Ключ: " << key << endl << endl;
 
-    string text = "ПРИВЕТМИР";
+    string text = "ПРИВЕТ МИР";
 
     cout << "Исходный текст: " << text << endl;
 
@@ -25,7 +25,15 @@ int main()
     cout << "Расшифровано: " << decrypted_text << endl;
 
     cout << endl;
-    if (text == decrypted_text) {
+
+    string expected_text = "";
+    for (char c : text) {
+        if (c != ' ') {
+            expected_text += c;
+        }
+    }
+
+    if (decrypted_text == expected_text) {
         cout << "Результат: Ok — шифрование работает!" << endl;
     } else {
         cout << "Результат: Fail — ошибка в шифровании." << endl;
