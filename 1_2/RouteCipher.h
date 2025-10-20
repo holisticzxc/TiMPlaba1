@@ -15,7 +15,6 @@ public:
 class RouteCipher {
 private:
     int Columns;
-    std::wstring RussianAlphabet = L"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
     
     void ValidateKey(int Key);
     void ValidateText(const std::wstring& Text);
