@@ -39,7 +39,6 @@ std::wstring RouteCipher::ToUpperCase(const std::wstring& Text) {
     for (wchar_t& c : Result) {
         c = std::toupper(c, loc);
     }
-    
     return Result;
 }
 
@@ -48,7 +47,6 @@ std::wstring RouteCipher::PrepareText(const std::wstring& Text) {
     if (Cleaned.empty()) {
         throw CipherError("После удаления пробелов и знаков препинания текст пуст");
     }
-    
     return ToUpperCase(Cleaned);
 }
 
@@ -59,23 +57,26 @@ std::wstring RouteCipher::Encrypt(const std::wstring& Text) {
     int TextLength = PreparedText.length();
     int Rows = (TextLength + Columns - 1) / Columns;
     
-    std::vector<std::vector<wchar_t>> Table(Rows, std::vector<wchar_t>(Columns, L' '));
+    // Создаем таблицу и заполняем по строкам слева направо
+    std::vector<std::vector<wchar_t>> Table(Rows, std::vector<wchar_t>(Columns));
     
-    int Index = 0;
+    int index = 0;
     for (int i = 0; i < Rows; i++) {
         for (int j = 0; j < Columns; j++) {
-            if (Index < TextLength) {
-                Table[i][j] = PreparedText[Index++];
+            if (index < TextLength) {
+                Table[i][j] = PreparedText[index++];
+            } else {
+                // Заполняем оставшиеся ячейки специальным символом
+                Table[i][j] = L'X';
             }
         }
     }
     
+    // Читаем по столбцам сверху вниз, справа налево
     std::wstring Result;
     for (int j = Columns - 1; j >= 0; j--) {
         for (int i = 0; i < Rows; i++) {
-            if (Table[i][j] != L' ') {
-                Result += Table[i][j];
-            }
+            Result += Table[i][j];
         }
     }
     
@@ -89,24 +90,32 @@ std::wstring RouteCipher::Decrypt(const std::wstring& Text) {
     int TextLength = PreparedText.length();
     int Rows = (TextLength + Columns - 1) / Columns;
     
-    std::vector<std::vector<wchar_t>> Table(Rows, std::vector<wchar_t>(Columns, L' '));
+    // Создаем пустую таблицу
+    std::vector<std::vector<wchar_t>> Table(Rows, std::vector<wchar_t>(Columns));
     
-    int Index = 0;
+    // Заполняем таблицу по столбцам сверху вниз, справа налево
+    int index = 0;
     for (int j = Columns - 1; j >= 0; j--) {
         for (int i = 0; i < Rows; i++) {
-            if (Index < TextLength) {
-                Table[i][j] = PreparedText[Index++];
+            if (index < TextLength) {
+                Table[i][j] = PreparedText[index++];
+            } else {
+                Table[i][j] = L'X';
             }
         }
     }
     
+    // Читаем по строкам слева направо
     std::wstring Result;
     for (int i = 0; i < Rows; i++) {
         for (int j = 0; j < Columns; j++) {
-            if (Table[i][j] != L' ') {
-                Result += Table[i][j];
-            }
+            Result += Table[i][j];
         }
+    }
+    
+    // Убираем добавленные символы 'X' в конце
+    while (!Result.empty() && Result.back() == L'X') {
+        Result.pop_back();
     }
     
     return Result;
